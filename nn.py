@@ -5,19 +5,18 @@ import numpy as np
 import mnist # The Handwritten Digits Dataset
 
 import json
+from termcolor import colored
 
 class NeuralNet:
 
-    def __init__(self, structure, random_init_bound, load=False, model_path=''):
+    def __init__(self, structure, random_init_bound, model_path=''):
 
         self.structure = structure
         self.n = len(self.structure)
 
-
-        if not load and model_path == '': # Init New Model
+        if model_path == '': # Init New Model
             self._construct_model(random_init_bound)
         else: # Load Model
-
             self.load(model_path)
 
     def _construct_model(self, random_bound):
@@ -122,7 +121,7 @@ class NeuralNet:
                     self.weights.append('*')
                     self.biases.append('*')
 
-            print("Loaded Successfully from {}.".format(load_path))
+            print(colored("Loaded Successfully from {}.".format(load_path), 'yellow'))
 
     def save(self, save_path):
 
@@ -142,7 +141,7 @@ class NeuralNet:
                     b.append('*')
 
             json.dump([w, b], saved_model)
-            print("Saved Successfully to {}.".format(save_path))
+            print(colored("Saved Successfully to {}.".format(save_path), 'green'))
 
     def fit(self, X_Data, Y_Data, loss_method, lr, lr_decay, epochs, batch_size, print_mode=0):
         
@@ -178,7 +177,7 @@ class NeuralNet:
             curr_lr = lr / (1 + lr_decay * e)
 
             if print_mode == 1:
-                loss = batch_loss/batch_size
+                loss = batch_loss/m
                 print("Epoch: {:0>3d} - Loss: {:.10f} - Δ: {:+.5f} - lr: {:.6f}".format(e, loss, loss - prev_loss, curr_lr))
                 prev_loss = loss
 
@@ -252,7 +251,7 @@ def main():
     structure = [(784, '*'), (35, 'sigmoid'), (10, 'sigmoid')]
     nn = NeuralNet(structure, 2)
 
-    nn.load('models/Hydrogen.json')
+    # nn.load('models/Hydrogen.json') # Load a model
 
     train_images = mnist.train_images()
     train_labels = mnist.train_labels()
@@ -272,10 +271,10 @@ def main():
     for i in range(Y_Test_Data.shape[1]):
         Y_Test_Data[test_labels[i]][i] = 1.0
 
-    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.02, 0.0005, 20, 100, print_mode=1)
+    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.02, 0.01, 200, 100, print_mode=1)
     nn.test(X_Test_Data, Y_Test_Data.T, 'MSE')
 
-    nn.save('models/Hydrogen.json')
+    nn.save('models/Boron.json') # Save model
 
 if __name__ == "__main__":
     main()
