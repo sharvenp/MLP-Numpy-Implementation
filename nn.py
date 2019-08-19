@@ -4,21 +4,27 @@
 import numpy as np
 import mnist # The Handwritten Digits Dataset
 
-class NN:
+import json
 
-    def __init__(self, structure, random_init_bound):
+class NeuralNet:
+
+    def __init__(self, structure, random_init_bound, load=False, model_path=''):
 
         self.structure = structure
         self.n = len(self.structure)
 
-        self._construct_model(random_init_bound)
+
+        if not load and model_path == '': # Init New Model
+            self._construct_model(random_init_bound)
+        else: # Load Model
+
+            self.load(model_path)
 
     def _construct_model(self, random_bound):
 
         # Init the Weights, Biases and Structure of NN
 
-        self.weights = []
-        self.biases = []
+        self.weights, self.biases = [], []
 
         for i in range(self.n):
             neurons, activation = self.structure[i]
@@ -97,6 +103,46 @@ class NN:
             db = np.sum(deltas[i], axis=0, keepdims=True)
             self.weights[k] -= dw.T * lr
             self.biases[k] -= db * lr
+
+    def load(self, load_path):
+
+        # Load a json file with model data
+
+        with open(load_path) as model_data:
+            data = json.load(model_data)
+            w, b = data[0], data[1]
+
+            self.weights, self.biases = [], [] 
+
+            for i in range(len(w)):
+                if i > 0:
+                    self.weights.append(np.array(w[i]))
+                    self.biases.append((np.array(b[i])))
+                else:
+                    self.weights.append('*')
+                    self.biases.append('*')
+
+            print("Loaded Successfully from {}.".format(load_path))
+
+    def save(self, save_path):
+
+        # Save this model to <save_path> as a json file
+
+        with open(save_path, 'w') as saved_model:
+
+            w, b = [], []
+
+            for i in range(len(self.weights)):
+
+                if i > 0:
+                    w.append(self.weights[i].tolist())
+                    b.append(self.biases[i].tolist())
+                else:
+                    w.append('*')
+                    b.append('*')
+
+            json.dump([w, b], saved_model)
+            print("Saved Successfully to {}.".format(save_path))
 
     def fit(self, X_Data, Y_Data, loss_method, lr, lr_decay, epochs, batch_size, print_mode=0):
         
@@ -203,8 +249,10 @@ def main():
     #                    [0, 0, 0, 0, 0, 0, 1, 0],
     #                    [0, 0, 0, 0, 0, 0, 0, 1]])
 
-    structure = [(784, '*'), (38, 'sigmoid'), (10, 'sigmoid')]
-    nn = NN(structure, 2)
+    structure = [(784, '*'), (35, 'sigmoid'), (10, 'sigmoid')]
+    nn = NeuralNet(structure, 2)
+
+    nn.load('models/Hydrogen.json')
 
     train_images = mnist.train_images()
     train_labels = mnist.train_labels()
@@ -224,8 +272,10 @@ def main():
     for i in range(Y_Test_Data.shape[1]):
         Y_Test_Data[test_labels[i]][i] = 1.0
 
-    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.02, 0.0005, 10, 100, print_mode=1)
+    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.02, 0.0005, 20, 100, print_mode=1)
     nn.test(X_Test_Data, Y_Test_Data.T, 'MSE')
+
+    nn.save('models/Hydrogen.json')
 
 if __name__ == "__main__":
     main()
