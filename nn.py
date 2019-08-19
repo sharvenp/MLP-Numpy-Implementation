@@ -3,9 +3,8 @@
 
 import numpy as np
 import mnist # The Handwritten Digits Dataset
-
 import json
-from termcolor import colored
+
 
 class NeuralNet:
 
@@ -121,7 +120,7 @@ class NeuralNet:
                     self.weights.append('*')
                     self.biases.append('*')
 
-            print(colored("Loaded Successfully from {}.".format(load_path), 'yellow'))
+            print("Loaded Successfully from {}.".format(load_path))
 
     def save(self, save_path):
 
@@ -141,7 +140,7 @@ class NeuralNet:
                     b.append('*')
 
             json.dump([w, b], saved_model)
-            print(colored("Saved Successfully to {}.".format(save_path), 'green'))
+            print("Saved Successfully to {}.".format(save_path))
 
     def fit(self, X_Data, Y_Data, loss_method, lr, lr_decay, epochs, batch_size, print_mode=0):
         
@@ -178,7 +177,7 @@ class NeuralNet:
 
             if print_mode == 1:
                 loss = batch_loss/m
-                print("Epoch: {:0>3d} - Loss: {:.10f} - Δ: {:+.5f} - lr: {:.6f}".format(e, loss, loss - prev_loss, curr_lr))
+                print("Epoch: {:0>3d} - Batch Loss: {:.10f} - Δ: {:+.5f} - lr: {:.6f}".format(e, loss, loss - prev_loss, curr_lr))
                 prev_loss = loss
 
     def test(self, X_Data, Y_Data, loss_method):
@@ -226,7 +225,9 @@ class NeuralNet:
         
 def main():
 
+    # Numpy Stuff
     # np.random.seed(1)
+    # np.set_printoptions(threshold=np.inf)
 
     # Toy Data for testing
 
@@ -251,7 +252,7 @@ def main():
     structure = [(784, '*'), (35, 'sigmoid'), (10, 'sigmoid')]
     nn = NeuralNet(structure, 2)
 
-    # nn.load('models/Hydrogen.json') # Load a model
+    nn.load('models/Carbon.json') # Load a model
 
     train_images = mnist.train_images()
     train_labels = mnist.train_labels()
@@ -271,10 +272,10 @@ def main():
     for i in range(Y_Test_Data.shape[1]):
         Y_Test_Data[test_labels[i]][i] = 1.0
 
-    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.02, 0.01, 200, 100, print_mode=1)
+    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.025, 0.01, 200, 100, print_mode=1)
     nn.test(X_Test_Data, Y_Test_Data.T, 'MSE')
 
-    nn.save('models/Boron.json') # Save model
+    nn.save('models/Carbon.json') # Save model
 
 if __name__ == "__main__":
     main()
