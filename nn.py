@@ -98,7 +98,7 @@ class NN:
             self.weights[k] -= dw.T * lr
             self.biases[k] -= db * lr
 
-    def fit(self, X_Data, Y_Data, loss_method, lr, lr_decay, epochs, batch_size, mode=0):
+    def fit(self, X_Data, Y_Data, loss_method, lr, lr_decay, epochs, batch_size, print_mode=0):
         
         # Train the NN with labels <X_Data, Y_Data>.
 
@@ -107,8 +107,7 @@ class NN:
         m = X_Data.shape[0] // batch_size
         prev_loss = 0
 
-        lr_0 = lr
-        curr_lr = lr_0
+        curr_lr = lr
 
         for e in range(epochs):
 
@@ -130,9 +129,9 @@ class NN:
                 self._back_prop(loss_method, Y, layers, activations, curr_lr)
 
             # Decay Learning Rate
-            curr_lr = lr_0 / (1 + lr_decay * e)
+            curr_lr = lr / (1 + lr_decay * e)
 
-            if mode == 1:
+            if print_mode == 1:
                 loss = batch_loss/batch_size
                 print("Epoch: {:0>3d} - Loss: {:.10f} - Δ: {:+.5f} - lr: {:.6f}".format(e, loss, loss - prev_loss, curr_lr))
                 prev_loss = loss
@@ -152,8 +151,8 @@ class NN:
             if np.argmax(output[i]) == np.argmax(Y_Data[i]):
                 correct += 1
 
-        print(f"Accuracy: {correct}/{samples} - {(correct/samples)*100} %")
-        print(f"Loss: {self._cost_function(loss_method, Y_Data, output, False)}")
+        print("Accuracy: {:3d}/{:6d} - {:.2%}".format(correct, samples,(correct/samples)*100))
+        print("Loss: {:.10f}".format(self._cost_function(loss_method, Y_Data, output, False)))
         print(30*"=")        
 
     def forward_prop(self, x):
