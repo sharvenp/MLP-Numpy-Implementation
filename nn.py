@@ -140,7 +140,7 @@ class NN:
 
         # Test the NN with X_Data and Expected Y_Data
 
-        print(30*"=")
+        print(60*"=")
         print("Testing:")
 
         output = self.forward_prop(X_Data)[1][-1]
@@ -151,9 +151,9 @@ class NN:
             if np.argmax(output[i]) == np.argmax(Y_Data[i]):
                 correct += 1
 
-        print("Accuracy: {:3d}/{:6d} - {:.2%}".format(correct, samples,(correct/samples)*100))
+        print("Accuracy: {:2d}/{:5d} - {:.2f} %".format(correct, samples, ((correct/samples)*100)))
         print("Loss: {:.10f}".format(self._cost_function(loss_method, Y_Data, output, False)))
-        print(30*"=")        
+        print(60*"=")        
 
     def forward_prop(self, x):
         
@@ -224,7 +224,7 @@ def main():
     for i in range(Y_Test_Data.shape[1]):
         Y_Test_Data[test_labels[i]][i] = 1.0
 
-    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.02, 0.0005, 100, 100, mode=1)
+    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.02, 0.0005, 10, 100, print_mode=1)
     nn.test(X_Test_Data, Y_Test_Data.T, 'MSE')
 
 if __name__ == "__main__":
