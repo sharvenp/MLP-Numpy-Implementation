@@ -177,7 +177,7 @@ class NeuralNet:
 
             if print_mode == 1:
                 loss = batch_loss/m
-                print("Epoch: {:0>3d} - Batch Loss: {:.10f} - Δ: {:+.5f} - lr: {:.6f}".format(e, loss, loss - prev_loss, curr_lr))
+                print("Epoch: {:0>3d} - Loss: {:.10f} - Δ: {:+.5f} - lr: {:.6f}".format(e, loss, loss - prev_loss, curr_lr))
                 prev_loss = loss
 
     def test(self, X_Data, Y_Data, loss_method):
@@ -249,10 +249,10 @@ def main():
     #                    [0, 0, 0, 0, 0, 0, 1, 0],
     #                    [0, 0, 0, 0, 0, 0, 0, 1]])
 
-    structure = [(784, '*'), (35, 'sigmoid'), (10, 'sigmoid')]
-    nn = NeuralNet(structure, 2)
+    structure = [(784, '*'), (38, 'sigmoid'), (10, 'sigmoid')]
+    nn = NeuralNet(structure, 0.1)
 
-    # nn.load('models/Carbon.json') # Load a model
+    nn.load('models/Neon.json') # Load a model
 
     train_images = mnist.train_images()
     train_labels = mnist.train_labels()
@@ -272,10 +272,10 @@ def main():
     for i in range(Y_Test_Data.shape[1]):
         Y_Test_Data[test_labels[i]][i] = 1.0
 
-    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.1, 0.1, 100, 50, print_mode=1)
+    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.01, 0.05, 50, 50, print_mode=1)
     nn.test(X_Test_Data, Y_Test_Data.T, 'MSE')
 
-    nn.save('models/Oxygen.json') # Save model
+    nn.save('models/Neon.json') # Save model
 
 if __name__ == "__main__":
     main()
