@@ -252,7 +252,7 @@ def main():
     structure = [(784, '*'), (35, 'sigmoid'), (10, 'sigmoid')]
     nn = NeuralNet(structure, 2)
 
-    nn.load('models/Carbon.json') # Load a model
+    # nn.load('models/Carbon.json') # Load a model
 
     train_images = mnist.train_images()
     train_labels = mnist.train_labels()
@@ -260,10 +260,10 @@ def main():
     test_images = mnist.test_images()
     test_labels = mnist.test_labels()
 
-    X_Test_Data = (test_images.reshape(test_images.shape[0], 784))/256.0
+    X_Test_Data = (test_images.reshape(test_images.shape[0], 784))/255.0
     Y_Test_Data = np.zeros((10,10000))
 
-    X_Train_Data = (train_images.reshape(train_images.shape[0], 784))/256.0
+    X_Train_Data = (train_images.reshape(train_images.shape[0], 784))/255.0
     Y_Train_Data = np.zeros((10,60000))
     
     for i in range(Y_Train_Data.shape[1]):
@@ -272,10 +272,10 @@ def main():
     for i in range(Y_Test_Data.shape[1]):
         Y_Test_Data[test_labels[i]][i] = 1.0
 
-    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.025, 0.01, 200, 100, print_mode=1)
+    nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.1, 0.1, 100, 50, print_mode=1)
     nn.test(X_Test_Data, Y_Test_Data.T, 'MSE')
 
-    nn.save('models/Carbon.json') # Save model
+    nn.save('models/Oxygen.json') # Save model
 
 if __name__ == "__main__":
     main()
