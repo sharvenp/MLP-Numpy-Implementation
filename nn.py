@@ -5,10 +5,9 @@ import numpy as np
 import mnist # The Handwritten Digits Dataset
 import json
 
-
 class NeuralNet:
 
-    def __init__(self, structure, random_init_bound, model_path=''):
+    def __init__(self, structure, random_init_bound=1, model_path=''):
 
         self.structure = structure
         self.n = len(self.structure)
@@ -30,7 +29,7 @@ class NeuralNet:
                 self.weights.append('*')
                 self.biases.append('*')
             else:
-                self.weights.append( (random_bound * np.random.random((self.structure[i - 1][0], neurons))) - (random_bound/2))
+                self.weights.append( ((2*random_bound) * np.random.random((self.structure[i - 1][0], neurons))) - random_bound)
                 self.biases.append( (random_bound * np.random.random((1, neurons))) - (random_bound/2) ) 
 
     def _cost_function(self, method, y, y_hat, deriv):
@@ -39,7 +38,7 @@ class NeuralNet:
 
         if method == 'MSE': # Mean Squared Error
             if deriv:
-                return y_hat - y
+                return (1/y_hat.shape[0]) * (y_hat - y)
             else:
                 return np.sum((y - y_hat)**2) / (2 * y_hat.shape[0])
 
@@ -77,7 +76,7 @@ class NeuralNet:
         
         # Back Propagation
 
-        curr_delta =  (1/Y_Data.shape[0]) * self._cost_function(loss_method, Y_Data, activations[-1], True)
+        curr_delta = self._cost_function(loss_method, Y_Data, activations[-1], True)
 
         deltas = [curr_delta]
 
@@ -146,7 +145,8 @@ class NeuralNet:
         
         # Train the NN with labels <X_Data, Y_Data>.
 
-        print(f"Training for {epochs} epochs:")
+        if print_mode:
+            print(f"Training for {epochs} epochs:")
 
         m = X_Data.shape[0] // batch_size
         prev_loss = 0
@@ -175,9 +175,9 @@ class NeuralNet:
             # Decay Learning Rate
             curr_lr = lr / (1 + lr_decay * e)
 
-            if print_mode == 1:
+            if print_mode:
                 loss = batch_loss/m
-                print("Epoch: {:0>3d} - Loss: {:.10f} - Δ: {:+.5f} - lr: {:.6f}".format(e, loss, loss - prev_loss, curr_lr))
+                print("Epoch: {:0>3d} - Loss: {:.10f} - delta: {:+.5f} - lr: {:.6f}".format(e, loss, loss - prev_loss, curr_lr))
                 prev_loss = loss
 
     def test(self, X_Data, Y_Data, loss_method):
@@ -250,9 +250,9 @@ def main():
     #                    [0, 0, 0, 0, 0, 0, 0, 1]])
 
     structure = [(784, '*'), (38, 'sigmoid'), (10, 'sigmoid')]
-    nn = NeuralNet(structure, 0.1)
+    nn = NeuralNet(structure, random_init_bound=0.05)
 
-    nn.load('models/Neon.json') # Load a model
+    # nn.load('models/Neon.json') # Load a model
 
     train_images = mnist.train_images()
     train_labels = mnist.train_labels()
@@ -275,7 +275,7 @@ def main():
     nn.fit(X_Train_Data, Y_Train_Data.T, 'MSE', 0.01, 0.05, 50, 50, print_mode=1)
     nn.test(X_Test_Data, Y_Test_Data.T, 'MSE')
 
-    nn.save('models/Neon.json') # Save model
+    nn.save('models/Sodium.json') # Save model
 
 if __name__ == "__main__":
     main()
